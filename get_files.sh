@@ -16,5 +16,6 @@ dir_url=${dir_url:14:-1}
 files=$(curl_github_api "$dir_url?recursive=1" | grep '"type": "blob"' -B2 | grep '"path":')
 while IFS= read -r filename
 do
+  filename=${filename:15:-2}
   curl https://raw.githubusercontent.com/bots-hosting-account/psdwbot/master/bot/$filename -o bot/$filename
 done <<< "$files"
