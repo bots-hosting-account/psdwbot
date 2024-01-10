@@ -2,7 +2,7 @@ element_list = []
 element_lookup = []
 element_symbols = []
 
-with open("elements.txt", "r") as elements_file:
+with open("assets/elements.txt", "r") as elements_file:
   for line in elements_file.read().split("\n"):
     vals = line.split()
     element_list.append(line)

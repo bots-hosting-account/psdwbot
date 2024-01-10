@@ -15,7 +15,7 @@ def get_words(filename):
       words.append(make_word(*row))
   return words
 
-words = get_words("eoo_words.csv")
+words = get_words("assets/eoo_words.csv")
 
 def search(query, search_eoo=False):
   search_field = "word" if search_eoo else "english"
