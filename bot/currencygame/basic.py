@@ -1,6 +1,6 @@
 import discord
 
-from replit import db
+from connect_database import connection
 
 from .items import items, Holidays, holiday
 
@@ -14,15 +14,18 @@ else:
 #################################### Database-related
 
 def commit_to_database():
-  pass
+  connection.commit()
 
 #################################### UID-related
 
 def ensure(uid):
-  b_uid = "B" + str(uid)
-  if b_uid not in db:
-    db[b_uid] = "0"
-    db[str(uid) + "Inewplayerpack"] = 1
+  with connection.cursor() as cursor:
+    uid_str = str(uid)
+    count_row = cursor.execute("SELECT COUNT(*) FROM balances WHERE id = :id", id=uid_str)
+    if count_row[0] == 0:
+      cursor.execute("INSERT INTO balances (id, balance) VALUES (:id, 0)", id=uid_str)
+      cursor.execute("INSERT INTO inventory (userid, item, amount) VALUES (:uid, 'newplayerpack', 1)", uid=uid_str)
+      commit_to_database()
 
 def parse_uid(guild, string):
   if string.isdigit():
@@ -50,22 +53,22 @@ def parse_uid(guild, string):
 
 #################################### Money-related
 
-def uid_has_money(uid):
-  return "B" + str(uid) in db
-
 def get_money(uid):
-  if uid_has_money(uid):
-    return int(db["B" + str(uid)])
-  else:
-    return 0
+  with connection.cursor() as cursor:
+    count_row = cursor.execute("SELECT balance FROM balances WHERE id = :id", id=str(uid))
+  return count_row[0] if count_row is not None else 0
 
 def add_money(uid, amt):
   ensure(uid)
-  db["B" + str(uid)] = str(get_money(uid) + amt)
+  with connection.cursor() as cursor:
+    cursor.execute("UPDATE balances SET balance = balance + :amount WHERE id = :id", amount=amt, id=str(uid))
+  commit_to_database()
 
 def set_money(uid, amt):
   ensure(uid)
-  db["B" + str(uid)] = str(amt)
+  with connection.cursor() as cursor:
+    cursor.execute("UPDATE balances SET balance = :amount WHERE id = :id", amount=amt, id=str(uid))
+  commit_to_database()
 
 def format(amt):
   return f"֏{amt:,}"
@@ -84,30 +87,27 @@ def get_item_id(string):
     return None
 
 def user_has_item(uid, item_id):
-  item_key = f"{uid}I{item_id}"
-  return item_key in db
+  with connection.cursor() as cursor()
+    count_row = cursor.execute("SELECT COUNT(*) FROM inventory WHERE userid = :uid AND item = :item", uid=str(uid), item=item_id)
+  return count_row[0] == 1
 
-def add_item(uid, item, amount=1):
-  itemuser_id = f"{uid}I{item.id}"
-  if itemuser_id not in db:
-    db[itemuser_id] = str(amount)
-  else:
-    old_amt = int(db[itemuser_id])
-    db[itemuser_id] = str(old_amt + amount)
-
-def remove_item(uid, item, number_to_remove=1):
-  itemuser_id = f"{uid}I{item.id}"
-  if itemuser_id in db:
-    old_amt = int(db[itemuser_id])
-    new_value = old_amt - number_to_remove
-    if new_value == 0:
-      del db[itemuser_id]
+def add_item(uid, item_id, amount=1):
+  with connection.cursor() as cursor:
+    if user_has_item(uid, item_id):
+      cursor.execute("UPDATE inventory SET amount = amount + :amount WHERE userid = :uid AND item = :item", amount=amount, uid=str(uid), item=item_id)
     else:
-      db[itemuser_id] = str(new_value)
+      cursor.execute("INSERT INTO inventory (userid, item, amount) VALUES (:uid, :item, :amount)", uid=str(uid), item=item_id, amount=amount)
+  commit_to_database()
+
+def remove_item(uid, item_id, number_to_remove=1):
+  with connection.cursor() as cursor:
+    row = cursor.execute("SELECT amount FROM inventory WHERE userid = :uid AND item = :item", uid=str(uid), item=item_id)
+    old_amount = row[0] if row is not None else 0
+    new_amount = max(old_amount - number_to_remove, 0)
+    cursor.execute("UPDATE inventory SET amount = :amount WHERE userid = :uid AND item = :item", amount=new_amount, uid=str(uid), item=item_id)
+  commit_to_database()
 
 def get_item_count(uid, item_id):
-  full_id = f"{uid}I{item_id}"
-  if full_id in db:
-    return int(db[full_id])
-  else:
-    return 0
+  with connection.cursor() as cursor:
+    row = cursor.execute("SELECT amount FROM inventory WHERE userid = :uid AND item = :item", uid=str(uid), item=item_id)
+  return row[0] if row is not None else 0

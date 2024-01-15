@@ -1,7 +1,7 @@
 from counting_base import CountingBase
 
-class CountingFib(CountingBase):
-  DATABASE_NAME = "fib"
+class CountingCustomFibonacci(CountingBase):
+  DATABASE_NAME = "cuf"
   DISPLAY_NAME = "custom Fibonacci number"
   
   START_VALUE = "the next number entered"
@@ -25,7 +25,10 @@ class CountingFib(CountingBase):
   
   @classmethod
   def get_current_number(cls):
-    return cls.current_number
+    if cls.current_number is None:
+      return cls.first_number
+    else:
+      return cls.current_number
   
   @classmethod
   def get_save_str(cls):
@@ -69,8 +72,4 @@ class CountingFib(CountingBase):
     cls.current_number = None
     cls.next_number = None
 
-  @classmethod
-  def is_valid_input(cls, value):
-    return all(c in "0123456789" for c in value)
-
-CountingFib.initialise()
+CountingCustomFibonacci.initialise()

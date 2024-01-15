@@ -3,14 +3,14 @@ from discord_ui import Button
 
 import random
 import time
-from replit import db
 from asyncio.exceptions import TimeoutError as AETimeoutError
+
+from connect_database import connection
 
 import trivia
 from .basic import commit_to_database, ensure, add_money, format
 from .mathematics import (
-  alter_digit,
-  binomials_to_string, get_multiplied_polynomial_labels
+  alter_digit, binomials_to_string, get_multiplied_polynomial_labels
 )
 
 jobs = {
@@ -60,25 +60,19 @@ jobs = {
 
 
 def get_shifts_worked(uid):
-  shifts_worked_key = "WS" + str(uid)
-  if shifts_worked_key in db:
-    return int(db[shifts_worked_key])
-  else:
-    db[shifts_worked_key] = "0"
-    return 0
+  with connection.cursor() as cursor:
+    row = cursor.execute("SELECT shifts FROM work WHERE userid = :uid", uid=str(uid))
+  return row[0] if row is not None else 0
 
 def add_work_shift(uid):
-  shifts_worked_key = "WS" + str(uid)
-  shifts_worked = int(db[shifts_worked_key])
-  db[shifts_worked_key] = str(shifts_worked + 1)
+  with connection.cursor() as cursor:
+    cursor.execute("UPDATE work SET shifts = shifts + 1 WHERE userid = :uid", uid=str(uid))
 
 
 def get_job_id(uid):
-  job_key = "WJ" + str(uid)
-  if job_key in db:
-    return db[job_key]
-  else:
-    return None
+  with connection.cursor() as cursor:
+    row = cursor.execute("SELECT job FROM work WHERE userid = :uid", uid=str(uid))
+  return row[0] if row is not None else None
 
 
 async def work(cmd_parts, message, client):
@@ -280,10 +274,7 @@ async def work(cmd_parts, message, client):
 async def list_jobs(message):
   uid = message.author.id
 
-  if get_job_id(uid) is not None:
-    shifts_worked = get_shifts_worked(uid)
-  else:
-    shifts_worked = 0
+  shifts_worked = get_shifts_worked(uid)
   
   description = "The faster you complete a shift, the higher the bonus for that shift. Use `+apply` to apply for a job."
   for job in jobs.values():
@@ -323,7 +314,14 @@ async def apply(cmd_parts, message):
   if job_id in jobs:
     new_job = jobs[job_id]
     if get_shifts_worked(uid) >= new_job["shifts"]:
-      db["WJ" + str(uid)] = job_id
+      with connection.cursor() as cursor:
+        uid_str = str(uid)
+        count_row = cursor.execute("SELECT COUNT(*) FROM work WHERE userid = :id", id=uid_str)
+        if count_row[0] == 1:
+          cursor.execute("UPDATE work SET job = :job WHERE userid = :uid", job=job_id, uid=uid_str)
+        else:
+          cursor.execute("INSERT INTO work (userid, job, shifts) VALUES (:uid, :job, 0)", uid=uid_str, job=job_id)
+      
       commit_to_database()
       e = Embed(title="You are now working as " + new_job["article"] + " **" + new_job["name"] + "**", description=f"Your base salary per shift is {format(new_job['base'])}.")
     else:
@@ -344,7 +342,8 @@ async def resign(message):
     await message.reply(embed=e)
     return
   
-  del db["WJ" + str(uid)]
+  with connection.cursor() as cursor:
+    cursor.execute("UPDATE work SET job = null WHERE userid = :uid", uid=str(uid))
   commit_to_database()
   
   if user_job_id in jobs:
