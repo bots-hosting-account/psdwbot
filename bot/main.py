@@ -45,8 +45,6 @@ from counting_fibonacci import CountingFibonacci
 from counting_custom_fibonacci import CountingCustomFibonacci
 from counting_prime import CountingPrime
 
-import keep_alive
-
 
 intents = discord.Intents.default()
 intents.members = True
@@ -636,7 +634,6 @@ async def on_reaction_add(reaction, user):
 
 @client.event
 async def on_ready():
-  keep_alive.keep_alive()
   print("Logged in as", client.user)
   await client.change_presence(activity=discord.Game(name="+help / +p help"))
   
