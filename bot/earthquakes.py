@@ -1,3 +1,4 @@
+import discord
 import urllib.request
 
 url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.csv"
@@ -36,3 +37,23 @@ def get_max_earthquakes():
   if total_len > 2000:
     data.pop()
   return data
+
+
+async def send_message(cmd_parts, message):
+  if len(cmd_parts) >= 2 and cmd_parts[1].isdigit():
+    n_quakes = int(cmd_parts[1]) or 5
+    quakes_str = "\n".join(get_n_earthquakes(n_quakes))
+  else:
+    quakes_str = "\n".join(get_max_earthquakes())
+  
+  try:
+    await message.channel.send(quakes_str)
+  
+  except discord.errors.HTTPException:
+    excess = len(quakes_str) - 2000
+    character_s = "character" if excess == 1 else "characters"
+    await message.channel.send(f"Message was {excess} {character_s} too long. Please request fewer earthquakes, the maximum is usually around 30.")
+  
+  except Exception as e:
+    await message.channel.send("An error occured. Please try again or request fewer earthquakes.")
+    raise e
