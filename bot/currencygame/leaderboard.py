@@ -1,57 +1,62 @@
 from discord import Embed
 
-from replit import db
+from connect_database import connection
 
 from .items import items
 from .basic import EMBED_COLOUR, format
 
 
-async def leaderboard(channel, users):
+async def leaderboard(client, channel, users):
   message = await channel.send("Loading leaderboard...")
-  b_prefix = db.prefix("B")
-
-  user_and_bals = [
-    (user, int(db[f"B{user.id}"])) for user in users if f"B{user.id}" in b_prefix
-  ]
-  e = get_leaderboard_embed(user_and_bals, "Leaderboard")
+  
+  with connection.cursor() as cursor:
+    balances = tuple(cursor.execute("SELECT id, balance FROM balances"))
+  user_ids_to_search = tuple(user.id for user in users)
+  user_rows = list(row for row in balances if row[0] in user_ids_to_search)
+  
+  e = get_leaderboard_embed(client, user_rows, "Leaderboard")
   e.set_footer(text="To see the leaderboard based on net worth, use `+netrich`. To see the global leaderboard, use `+rich g`.")
   await message.edit("", embed=e)
 
 
-async def net_worth_leaderboard(channel, users):
+async def net_worth_leaderboard(client, channel, users):
   message = await channel.send("Loading net worth leaderboard...")
-  b_prefix = db.prefix("B")
+  
+  with connection.cursor() as cursor:
+    balances = tuple(cursor.execute("SELECT id, balance FROM balances"))
+  user_ids_to_search = tuple(user.id for user in users)
+  user_rows = tuple(row for row in balances if row[0] in user_ids_to_search)
+  found_user_ids = tuple(row[0] for row in user_rows)
 
-  user_and_bals = []
-  for user in users:
-    net_worth = 0
-    user_in_system = False
+  inventory_query = "SELECT userid, item, amount FROM inventory WHERE userid in ("
+  inventory_query += ", ".join(f"'{int(uid)}'" for uid in found_user_ids)
+  inventory_query += ")"
+  with connection.cursor() as cursor:
+    items = tuple(cursor.execute(inventory_query))
+  item_index = 0
 
-    if f"B{user.id}" in b_prefix:
-      user_in_system = True
-      net_worth += int(db[f"B{user.id}"])
-
-      for inv_entry in db.prefix(f"{user.id}I"):
-        item = items[inv_entry.split("I")[1]]
-        count_in_inv = int(db[inv_entry])
-        item_value = count_in_inv * item.sell_price
-        net_worth += item_value
-
-    if net_worth > 0 or user_in_system:
-      user_and_bals.append((user, net_worth))
-
-  e = get_leaderboard_embed(user_and_bals, "Net Worth Leaderboard")
+  user_net_worths = []
+  for (uid, balance) in user_rows:
+    net_worth = balance
+    
+    while item_index < len(items) and items[item_index][0] == uid:
+      _, item_id, amount = items[item_index]
+      net_worth += items[item_id].sell_price * amount
+      item_index += 1
+    
+    user_net_worths.append((uid, net_worth))
+  
+  e = get_leaderboard_embed(client, user_net_worths, "Net Worth Leaderboard")
   e.set_footer(text="To see the leaderboard based on money only, use `+rich`. To see the global net worth leaderboard, use `+netrich g`.")
   await message.edit("", embed=e)
 
 
-def get_leaderboard_embed(user_and_bals, leaderboard_title):
-  #Sort by balances
-  user_and_bals.sort(key=lambda u_b: u_b[1], reverse=True)
+def get_leaderboard_embed(client, user_money_list, leaderboard_title):
+  user_money_list.sort(key=lambda _, money: money, reverse=True)
   
   str_lb = "\n".join(
-    f"**{format(bal)}** — {user.name}" for user, bal in user_and_bals
+    f"**{format(money)}** — {client.get_user(uid).name}" for uid, money in user_money_list
   )
-
+  
   e = Embed(title=leaderboard_title, description=str_lb, color=EMBED_COLOUR)
   return e

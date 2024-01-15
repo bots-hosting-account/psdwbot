@@ -1,5 +1,5 @@
 import discord
-from replit import db
+from connect_database import connection
 
 saved_channels = {}
 
@@ -10,8 +10,19 @@ async def save_channel_to_db(cmd_parts, message):
     return
   
   save_name = cmd_parts[1]
-  saved_channels[save_name] = message.channel
-  db.set(f"V{save_name}", message.channel.id)
+  
+  with connection.cursor() as cursor:
+    cursor.execute("SELECT id FROM channels WHERE name = :name", name=save_name)
+    channel_record = cursor.fetchone()
+    if channel_record is not None:
+      channel_id = channel_record[0]
+      channel = client.get_channel(channel_id)
+      channel_str = format_channel(channel) if channel else "inaccessible"
+      await message.reply("There is already a channel ({channel_str}) saved as {channel_name}")
+      return
+    
+    saved_channels[save_name] = message.channel
+    cursor.execute("INSERT INTO channels (name, id) VALUES (:name, :id)", name=save_name, id=str(message.channel.id))
   
   if not (len(cmd_parts) > 2 and "q" in cmd_parts[2]):
     await message.reply(f"Saved #{message.channel.name} as {save_name}")
@@ -103,9 +114,9 @@ def format_channel(channel):
 
 def initialise(client):
   global saved_channels
-  
-  saved = db.prefix("V")
-  for save_name in saved:
-    channel = client.get_channel(db.get(save_name))
-    if channel != None:
-      saved_channels[save_name[1:]] = channel
+  with connection.cursor() as cursor:
+    for channel_record in cursor.execute("SELECT name, id FROM channels"):
+      channel_name, channel_id = channel_record
+      channel = client.get_channel(int(channel_id))
+      if channel != None:
+        saved_channels[channel_name] = channel

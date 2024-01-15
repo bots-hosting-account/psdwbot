@@ -31,10 +31,9 @@ import currencygame.work as cgwork
 import features
 import elements
 import stupid_minesweeper
-import channels
 import cgol
 import trivia
-import fibcount
+import channels
 import eoo_words
 import dad_humour
 import earthquakes
@@ -42,7 +41,8 @@ import earthquakes
 import images
 
 from counting_chess import CountingChess
-from counting_fib import CountingFib
+from counting_fibonacci import CountingFibonacci
+from counting_custom_fibonacci import CountingCustomFibonacci
 from counting_prime import CountingPrime
 
 import keep_alive
@@ -435,14 +435,14 @@ async def eval_cmd(message):
       rich_users = client.users
     else:
       rich_users = message.guild.members
-    await cg.leaderboard(message.channel, rich_users)
+    await cg.leaderboard(client, message.channel, rich_users)
   
   elif cmd in ("netleaderboard", "netlb", "netrich"):
     if len(cmd_parts) > 1 and cmd_parts[1][0] in "Gg":
       rich_users = client.users
     else:
       rich_users = message.guild.members
-    await cg.net_worth_leaderboard(message.channel, rich_users)
+    await cg.net_worth_leaderboard(client, message.channel, rich_users)
 
   elif cmd in ("shop", "store", "market"):
     await cg.shop(message, client)
@@ -526,25 +526,22 @@ async def eval_cmd(message):
     await message.reply(f"The highest-reached chess count is **{CountingChess.get_high_score()}**.")
 
   elif cmd in ("count", "fibcount"):
-    await message.reply(f"The current Fibonacci number is **{fibcount.get_cur_fib()}**.")
+    await message.reply(f"The current Fibonacci number is **{CountingFibonacci.get_current_number()}**.")
   
   elif cmd in ("counths", "fibcounths", "fibhs"):
-    await message.reply(f"The highest-reached Fibonacci number is **{fibcount.high_score}**.")
+    await message.reply(f"The highest-reached Fibonacci number is **{CountingFibonacci.get_high_score()}**.")
   
   elif cmd in ("customcount", "custcount", "customfibcount", "custfibcount", "customfib", "custfib"):
-    await message.reply(f"The current custom Fibonacci number is **{CountingFib.get_current_number()}**.")
+    await message.reply(f"The current custom Fibonacci number is **{CountingCustomFibonacci.get_current_number()}**.")
   
   elif cmd in ("customhs", "cusths", "customfibhs", "custfibhs"):
-    await message.reply(f"The highest-reached custom Fibonacci number is **{CountingFib.get_high_score()}**.")
+    await message.reply(f"The highest-reached custom Fibonacci number is **{CountingCustomFibonacci.get_high_score()}**.")
 
   elif cmd in ("primecount", "prime"):
     await message.reply(f"The current prime number is **{CountingPrime.get_current_number()}**.")
 
   elif cmd == "primehs":
     await message.reply(f"The highest-reached prime number is **{CountingPrime.get_high_score()}**.")
-  
-  elif cmd in ("highscore", "hs"):
-    await message.reply(f"The highest-reached Fibonacci number is **{fibcount.high_score}**.")
   
   elif cmd in ("dictionary", "dict"):
     if len(cmd_parts) < 2:
@@ -677,9 +674,9 @@ async def on_message(message: discord.Message):
       await CountingPrime.check(message)
       await CountingChess.check(message)
     elif message.channel.name == "fibonacci":
-      await fibcount.check(message)
+      await CountingFibonacci.check(message)
     elif message.channel.name == "custom-fibonacci":
-      await CountingFib.check(message)
+      await CountingCustomFibonacci.check(message)
 
 
 if __name__ == "__main__":
