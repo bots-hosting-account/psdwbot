@@ -87,7 +87,7 @@ def get_item_id(string):
     return None
 
 def user_has_item(uid, item_id):
-  with connection.cursor() as cursor()
+  with connection.cursor() as cursor:
     count_row = cursor.execute("SELECT COUNT(*) FROM inventory WHERE userid = :uid AND item = :item", uid=str(uid), item=item_id)
   return count_row[0] == 1
 
