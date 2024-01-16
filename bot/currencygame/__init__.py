@@ -116,9 +116,9 @@ async def balance(message, cmd_parts, client, net_worth=False):
           money += items[item_id].sell_price * amount
     
     if uid == message.author.id:
-      msg = "You have {format(money)}."
+      msg = f"You have {format(money)}."
     else:
-      msg = client.get_user(uid).name + " has {format(money)}."
+      msg = client.get_user(uid).name + f" has {format(money)}."
   else:
     msg = f"The user '{given_name}' does not exist or is not in this server."
   await message.reply(msg)
