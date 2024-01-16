@@ -61,18 +61,18 @@ jobs = {
 
 def get_shifts_worked(uid):
   with connection.cursor() as cursor:
-    row = cursor.execute("SELECT shifts FROM work WHERE userid = :uid", uid=str(uid))
-  return row[0] if row is not None else 0
+    row = tuple(cursor.execute("SELECT shifts FROM work WHERE userid = :id", id=str(uid)))
+  return row[0] if len(row) > 0 else 0
 
 def add_work_shift(uid):
   with connection.cursor() as cursor:
-    cursor.execute("UPDATE work SET shifts = shifts + 1 WHERE userid = :uid", uid=str(uid))
+    cursor.execute("UPDATE work SET shifts = shifts + 1 WHERE userid = :id", id=str(uid))
 
 
 def get_job_id(uid):
   with connection.cursor() as cursor:
-    row = cursor.execute("SELECT job FROM work WHERE userid = :uid", uid=str(uid))
-  return row[0] if row is not None else None
+    row = tuple(cursor.execute("SELECT job FROM work WHERE userid = :id", id=str(uid)))
+  return row[0] if len(row) > 0 else None
 
 
 async def work(cmd_parts, message, client):
@@ -316,11 +316,11 @@ async def apply(cmd_parts, message):
     if get_shifts_worked(uid) >= new_job["shifts"]:
       with connection.cursor() as cursor:
         uid_str = str(uid)
-        count_row = cursor.execute("SELECT COUNT(*) FROM work WHERE userid = :id", id=uid_str)
+        count_row = tuple(cursor.execute("SELECT COUNT(*) FROM work WHERE userid = :id", id=uid_str))
         if count_row[0] == 1:
-          cursor.execute("UPDATE work SET job = :job WHERE userid = :uid", job=job_id, uid=uid_str)
+          cursor.execute("UPDATE work SET job = :job WHERE userid = :id", job=job_id, id=uid_str)
         else:
-          cursor.execute("INSERT INTO work (userid, job, shifts) VALUES (:uid, :job, 0)", uid=uid_str, job=job_id)
+          cursor.execute("INSERT INTO work (userid, job, shifts) VALUES (:id, :job, 0)", id=uid_str, job=job_id)
       
       commit_to_database()
       e = Embed(title="You are now working as " + new_job["article"] + " **" + new_job["name"] + "**", description=f"Your base salary per shift is {format(new_job['base'])}.")
@@ -343,7 +343,7 @@ async def resign(message):
     return
   
   with connection.cursor() as cursor:
-    cursor.execute("UPDATE work SET job = null WHERE userid = :uid", uid=str(uid))
+    cursor.execute("UPDATE work SET job = null WHERE userid = :id", id=str(uid))
   commit_to_database()
   
   if user_job_id in jobs:

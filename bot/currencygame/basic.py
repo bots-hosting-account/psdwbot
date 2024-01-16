@@ -21,10 +21,10 @@ def commit_to_database():
 def ensure(uid):
   with connection.cursor() as cursor:
     uid_str = str(uid)
-    count_row = cursor.execute("SELECT COUNT(*) FROM balances WHERE id = :id", id=uid_str)
+    count_row = tuple(cursor.execute("SELECT COUNT(*) FROM balances WHERE id = :id", id=uid_str))
     if count_row[0] == 0:
       cursor.execute("INSERT INTO balances (id, balance) VALUES (:id, 0)", id=uid_str)
-      cursor.execute("INSERT INTO inventory (userid, item, amount) VALUES (:uid, 'newplayerpack', 1)", uid=uid_str)
+      cursor.execute("INSERT INTO inventory (userid, item, amount) VALUES (:id, 'newplayerpack', 1)", id=uid_str)
       commit_to_database()
 
 def parse_uid(guild, string):
@@ -55,8 +55,8 @@ def parse_uid(guild, string):
 
 def get_money(uid):
   with connection.cursor() as cursor:
-    count_row = cursor.execute("SELECT balance FROM balances WHERE id = :id", id=str(uid))
-  return count_row[0] if count_row is not None else 0
+    row = tuple(cursor.execute("SELECT balance FROM balances WHERE id = :id", id=str(uid)))
+  return row[0] if len(row) > 0 else 0
 
 def add_money(uid, amt):
   ensure(uid)
@@ -88,26 +88,26 @@ def get_item_id(string):
 
 def user_has_item(uid, item_id):
   with connection.cursor() as cursor:
-    count_row = cursor.execute("SELECT COUNT(*) FROM inventory WHERE userid = :uid AND item = :item", uid=str(uid), item=item_id)
+    count_row = tuple(cursor.execute("SELECT COUNT(*) FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item_id))
   return count_row[0] == 1
 
 def add_item(uid, item_id, amount=1):
   with connection.cursor() as cursor:
     if user_has_item(uid, item_id):
-      cursor.execute("UPDATE inventory SET amount = amount + :amount WHERE userid = :uid AND item = :item", amount=amount, uid=str(uid), item=item_id)
+      cursor.execute("UPDATE inventory SET amount = amount + :amount WHERE userid = :id AND item = :item", amount=amount, id=str(uid), item=item_id)
     else:
-      cursor.execute("INSERT INTO inventory (userid, item, amount) VALUES (:uid, :item, :amount)", uid=str(uid), item=item_id, amount=amount)
+      cursor.execute("INSERT INTO inventory (userid, item, amount) VALUES (:id, :item, :amount)", id=str(uid), item=item_id, amount=amount)
   commit_to_database()
 
 def remove_item(uid, item_id, number_to_remove=1):
   with connection.cursor() as cursor:
-    row = cursor.execute("SELECT amount FROM inventory WHERE userid = :uid AND item = :item", uid=str(uid), item=item_id)
-    old_amount = row[0] if row is not None else 0
+    row = tuple(cursor.execute("SELECT amount FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item_id))
+    old_amount = row[0]
     new_amount = max(old_amount - number_to_remove, 0)
-    cursor.execute("UPDATE inventory SET amount = :amount WHERE userid = :uid AND item = :item", amount=new_amount, uid=str(uid), item=item_id)
+    cursor.execute("UPDATE inventory SET amount = :amount WHERE userid = :id AND item = :item", amount=new_amount, id=str(uid), item=item_id)
   commit_to_database()
 
 def get_item_count(uid, item_id):
   with connection.cursor() as cursor:
-    row = cursor.execute("SELECT amount FROM inventory WHERE userid = :uid AND item = :item", uid=str(uid), item=item_id)
-  return row[0] if row is not None else 0
+    row = tuple(cursor.execute("SELECT amount FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item_id))
+  return row[0] if len(row) > 0 else 0

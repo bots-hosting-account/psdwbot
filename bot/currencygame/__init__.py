@@ -111,7 +111,7 @@ async def balance(message, cmd_parts, client, net_worth=False):
     money = get_money(uid)
     if net_worth:
       with connection.cursor() as cursor:
-        items = cursor.execute("SELECT item, amount FROM inventory WHERE userid = :uid", uid=str(uid))
+        items = cursor.execute("SELECT item, amount FROM inventory WHERE userid = :id", id=str(uid))
         for (item_id, amount) in items:
           money += items[item_id].sell_price * amount
     
@@ -199,7 +199,7 @@ async def _send_inventory_message(uid, message, client):
 
 def get_inv_data(uid):
   with connection.cursor() as cursor:
-    items = cursor.execute("SELECT item, amount FROM inventory WHERE userid = :uid", uid=str(uid))
+    items = cursor.execute("SELECT item, amount FROM inventory WHERE userid = :id", id=str(uid))
   return [(items[item_id], amount) for item_id, amount in items]
 
 #################################### dig, hunt, fish
