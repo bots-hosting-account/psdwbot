@@ -61,8 +61,9 @@ jobs = {
 
 def get_shifts_worked(uid):
   with connection.cursor() as cursor:
-    row = tuple(cursor.execute("SELECT shifts FROM work WHERE userid = :id", id=str(uid)))
-  return row[0] if len(row) > 0 else 0
+    cursor.execute("SELECT shifts FROM work WHERE userid = :id", id=str(uid))
+  row = cursor.fetchone()
+  return row[0] if row is not None else 0
 
 def add_work_shift(uid):
   with connection.cursor() as cursor:
@@ -71,8 +72,9 @@ def add_work_shift(uid):
 
 def get_job_id(uid):
   with connection.cursor() as cursor:
-    row = tuple(cursor.execute("SELECT job FROM work WHERE userid = :id", id=str(uid)))
-  return row[0] if len(row) > 0 else None
+    cursor.execute("SELECT job FROM work WHERE userid = :id", id=str(uid))
+  row = cursor.fetchone()
+  return row[0] if row is not None else None
 
 
 async def work(cmd_parts, message, client):
