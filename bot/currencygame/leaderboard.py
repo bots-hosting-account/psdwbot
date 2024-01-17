@@ -24,23 +24,23 @@ async def net_worth_leaderboard(client, channel, users):
   
   with connection.cursor() as cursor:
     balances = tuple(cursor.execute("SELECT id, balance FROM balances"))
-  user_ids_to_search = tuple(user.id for user in users)
+  user_ids_to_search = tuple(str(int(user.id)) for user in users)
   user_rows = tuple(row for row in balances if row[0] in user_ids_to_search)
   found_user_ids = tuple(row[0] for row in user_rows)
 
   inventory_query = "SELECT userid, item, amount FROM inventory WHERE userid in ("
-  inventory_query += ", ".join(f"'{int(uid)}'" for uid in found_user_ids)
+  inventory_query += ", ".join(f"'{uid}'" for uid in found_user_ids)
   inventory_query += ")"
   with connection.cursor() as cursor:
-    items = tuple(cursor.execute(inventory_query))
+    found_items = tuple(cursor.execute(inventory_query))
   item_index = 0
 
   user_net_worths = []
   for (uid, balance) in user_rows:
     net_worth = balance
     
-    while item_index < len(items) and items[item_index][0] == uid:
-      _, item_id, amount = items[item_index]
+    while item_index < len(found_items) and found_items[item_index][0] == uid:
+      _, item_id, amount = found_items[item_index]
       net_worth += items[item_id].sell_price * amount
       item_index += 1
     
@@ -52,7 +52,7 @@ async def net_worth_leaderboard(client, channel, users):
 
 
 def get_leaderboard_embed(client, user_money_list, leaderboard_title):
-  user_money_list.sort(key=lambda _, money: money, reverse=True)
+  user_money_list.sort(key=lambda user_and_money: user_and_money[1], reverse=True)
   
   str_lb = "\n".join(
     f"**{format(money)}** — {client.get_user(uid).name}" for uid, money in user_money_list
