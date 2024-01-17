@@ -62,7 +62,7 @@ jobs = {
 def get_shifts_worked(uid):
   with connection.cursor() as cursor:
     cursor.execute("SELECT shifts FROM work WHERE userid = :id", id=str(uid))
-  row = cursor.fetchone()
+    row = cursor.fetchone()
   return row[0] if row is not None else 0
 
 def add_work_shift(uid):
@@ -73,7 +73,7 @@ def add_work_shift(uid):
 def get_job_id(uid):
   with connection.cursor() as cursor:
     cursor.execute("SELECT job FROM work WHERE userid = :id", id=str(uid))
-  row = cursor.fetchone()
+    row = cursor.fetchone()
   return row[0] if row is not None else None
 
 
