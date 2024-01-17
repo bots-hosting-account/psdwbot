@@ -56,7 +56,7 @@ def parse_uid(guild, string):
 def get_money(uid):
   with connection.cursor() as cursor:
     cursor.execute("SELECT balance FROM balances WHERE id = :id", id=str(uid))
-  row = cursor.fetchone()
+    row = cursor.fetchone()
   return row[0] if row is not None else 0
 
 def add_money(uid, amt):
@@ -111,5 +111,5 @@ def remove_item(uid, item_id, number_to_remove=1):
 def get_item_count(uid, item_id):
   with connection.cursor() as cursor:
     cursor.execute("SELECT amount FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item_id)
-  row = cursor.fetchone()
+    row = cursor.fetchone()
   return row[0] if row is not None else 0
