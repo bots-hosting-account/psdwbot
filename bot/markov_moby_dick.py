@@ -36,7 +36,7 @@ def generate_moby_dick(max_len=200):
   words = page.read().decode(charset).lower().split()
   return markov_with_words(words, max_len)
 
-def send_message(cmd_parts, message):
+async def send_message(cmd_parts, message):
   has_maximum = len(cmd_parts) >= 2 and is_valid_max(cmd_parts[1])
 
   if has_maximum:
