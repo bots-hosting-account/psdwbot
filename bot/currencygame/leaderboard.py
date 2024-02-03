@@ -12,7 +12,7 @@ async def leaderboard(client, channel, users):
   with connection.cursor() as cursor:
     balances = tuple(cursor.execute("SELECT id, balance FROM balances"))
   user_ids_to_search = tuple(user.id for user in users)
-  user_rows = list(row for row in balances if row[0] in user_ids_to_search)
+  user_rows = list(row for row in balances if int(row[0]) in user_ids_to_search)
   
   e = get_leaderboard_embed(client, user_rows, "Leaderboard")
   e.set_footer(text="To see the leaderboard based on net worth, use `+netrich`. To see the global leaderboard, use `+rich g`.")
@@ -55,7 +55,7 @@ def get_leaderboard_embed(client, user_money_list, leaderboard_title):
   user_money_list.sort(key=lambda user_and_money: user_and_money[1], reverse=True)
   
   str_lb = "\n".join(
-    f"**{format(money)}** — {client.get_user(uid).name}" for uid, money in user_money_list
+    f"**{format(money)}** — {client.get_user(int(uid)).name}" for uid, money in user_money_list
   )
   
   e = Embed(title=leaderboard_title, description=str_lb, color=EMBED_COLOUR)

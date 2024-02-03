@@ -26,6 +26,7 @@ import divisions
 print("Importing...")
 import markov
 import markov_wrapper
+import markov_moby_dick
 import currencygame as cg
 import currencygame.work as cgwork
 import features
@@ -340,6 +341,9 @@ async def eval_cmd(message):
   elif cmd in ("markov", "m", "markovword", "markovwords", "mw"):
     use_words = "w" in cmd
     await markov_wrapper.send_message(cmd_parts, message, use_words)
+  
+  elif cmd in ("moby", "mobydick", "md"):
+    await markov_moby_dick.send_message(cmd_parts, message)
   
   elif cmd in ("markovadjective", "madj", "ma"):
     with open("assets/words/adjs.txt") as adjs_file:
