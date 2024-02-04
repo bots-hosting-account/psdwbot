@@ -2,8 +2,6 @@ import random
 from collections import defaultdict
 import urllib.request
 
-from markov import is_valid_max
-
 MOBY_DICK_URL = "https://gist.githubusercontent.com/ktnyt/734e32aab75a4f7df06538dac9f00a5a/raw/8da85d5acabc53fd66af17c252701b0ba395e6c1/moby.txt"
 
 def get_rules(words):
@@ -41,8 +39,8 @@ def generate_moby_dick(max_len=200):
   return markov_with_words(words, max_len)
 
 async def send_message(cmd_parts, message):
-  has_maximum = len(cmd_parts) >= 2 and is_valid_max(cmd_parts[1])
-
+  has_maximum = len(cmd_parts) >= 2 and cmd_parts[1].isdigit() and int(cmd_parts[1]) > 0
+  
   if has_maximum:
     maximum_length = min(int(cmd_parts[1]), 2000)
     await message.reply(generate_moby_dick(maximum_length))
