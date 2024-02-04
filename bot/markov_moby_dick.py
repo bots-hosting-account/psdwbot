@@ -21,12 +21,16 @@ def markov_with_words(words, max_len):
   cur_word = random.choice(words)
   result = cur_word
   
-  while len(result) < max_len:
+  while True:
     cur_word = random.choice(rules[cur_word])
     if cur_word is None:
       break
     else:
+      old_result = result
       result += " " + cur_word
+      if len(result) > max_len:
+        result = old_result
+        break
 
   return result
 

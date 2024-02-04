@@ -27,17 +27,17 @@ def markov(words, possible_starts, max_len):
 
   return result
 
-def markov_sentence(text, max_len=200):
+def sentence(text, max_len=200):
   words = text.lower().split()
   possible_starts = get_first_chars(words)
   return markov([text.lower()], possible_starts, max_len)
 
-def markov_word(text, max_len=200):
+def word(text, max_len=200):
   words = text.lower().split()
   possible_starts = get_first_chars(words)
   return markov(words, possible_starts, max_len)
 
-def is_valid_max_markov(text):
+def is_valid_max(text):
   return (
     len(text) >= 2 and text[0] == "!"
     and all(c in "0123456789" for c in text[1:])
