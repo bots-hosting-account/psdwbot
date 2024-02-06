@@ -36,7 +36,7 @@ def get_adj():
 def get_sentence(end=".", capitalise_first_word=True):
   sentence = get_noun()
   if capitalise_first_word:
-    sentence = sentence.title()
+    sentence = sentence[0].upper() + sentence[1:].lower()
   sentence += " " + get_verb() + " " + get_noun() + end
   return sentence
 
