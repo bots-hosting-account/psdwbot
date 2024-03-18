@@ -79,7 +79,7 @@ class CountingBase:
         else:
           what_wrong = cls.MESSAGE_INCORRECT
         await msg.add_reaction("\u274c")
-        await msg.reply(f"{msg.author.mention} RUINED IT AT **{cls.get_current_number()}**!! Next {cls.COUNTING_NAME} is **{cls.START_VALUE}**. **{what_wrong}**")
+        await msg.reply(f"{msg.author.mention} RUINED IT AT **{cls.get_current_number()}**!! Next {cls.DISPLAY_NAME} is **{cls.START_VALUE}**. **{what_wrong}**")
         cls.last_uid = 0
         cls.reset()
       
