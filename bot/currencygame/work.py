@@ -318,7 +318,7 @@ async def apply(cmd_parts, message):
     if get_shifts_worked(uid) >= new_job["shifts"]:
       with connection.cursor() as cursor:
         uid_str = str(uid)
-        count_row = tuple(cursor.execute("SELECT COUNT(*) FROM work WHERE userid = :id", id=uid_str))
+        count_row = tuple(cursor.execute("SELECT COUNT(*) FROM work WHERE userid = :id", id=uid_str))[0]
         if count_row[0] == 1:
           cursor.execute("UPDATE work SET job = :job WHERE userid = :id", job=job_id, id=uid_str)
         else:
