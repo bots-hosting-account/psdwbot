@@ -200,7 +200,7 @@ async def _send_inventory_message(uid, message, client):
 def get_inv_data(uid):
   with connection.cursor() as cursor:
     item_rows = tuple(cursor.execute("SELECT item, amount FROM inventory WHERE userid = :id", id=str(uid)))
-  return [(item_rows[item_id], amount) for item_id, amount in item_rows]
+  return [(items[item_id], amount) for item_id, amount in item_rows]
 
 #################################### dig, hunt, fish
 

@@ -21,7 +21,7 @@ def commit_to_database():
 def ensure(uid):
   with connection.cursor() as cursor:
     uid_str = str(uid)
-    count_row = tuple(cursor.execute("SELECT COUNT(*) FROM balances WHERE id = :id", id=uid_str))
+    count_row = tuple(cursor.execute("SELECT COUNT(*) FROM balances WHERE id = :id", id=uid_str))[0]
     if count_row[0] == 0:
       cursor.execute("INSERT INTO balances (id, balance) VALUES (:id, 0)", id=uid_str)
       cursor.execute("INSERT INTO inventory (userid, item, amount) VALUES (:id, 'newplayerpack', 1)", id=uid_str)
@@ -89,12 +89,12 @@ def get_item_id(string):
 
 def user_has_item(uid, item_id):
   with connection.cursor() as cursor:
-    count_row = tuple(cursor.execute("SELECT COUNT(*) FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item_id))
+    count_row = tuple(cursor.execute("SELECT COUNT(*) FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item_id))[0]
   return count_row[0] == 1
 
 def add_item(uid, item, amount=1):
   with connection.cursor() as cursor:
-    if user_has_item(uid, item):
+    if user_has_item(uid, item.id):
       cursor.execute("UPDATE inventory SET amount = amount + :amount WHERE userid = :id AND item = :item", amount=amount, id=str(uid), item=item.id)
     else:
       cursor.execute("INSERT INTO inventory (userid, item, amount) VALUES (:id, :item, :amount)", id=str(uid), item=item.id, amount=amount)
@@ -108,8 +108,8 @@ def remove_item(uid, item, number_to_remove=1):
     cursor.execute("UPDATE inventory SET amount = :amount WHERE userid = :id AND item = :item", amount=new_amount, id=str(uid), item=item.id)
   commit_to_database()
 
-def get_item_count(uid, item):
+def get_item_count(uid, item_id):
   with connection.cursor() as cursor:
-    cursor.execute("SELECT amount FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item.id)
+    cursor.execute("SELECT amount FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item_id)
     row = cursor.fetchone()
   return row[0] if row is not None else 0

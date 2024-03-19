@@ -5,7 +5,7 @@ from random import randint, choice, sample
 from asyncio.exceptions import TimeoutError as AETimeoutError
 
 from .items import items, Holidays, holiday
-from .basic import commit_to_database, ensure, add_money, add_item
+from .basic import commit_to_database, ensure, add_money, format, add_item
 
 search_dict = {
   "couch": "who knows what else is down there...",
