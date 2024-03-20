@@ -102,10 +102,13 @@ def add_item(uid, item, amount=1):
 
 def remove_item(uid, item, number_to_remove=1):
   with connection.cursor() as cursor:
-    row = tuple(cursor.execute("SELECT amount FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item.id))
+    row = tuple(cursor.execute("SELECT amount FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item.id))[0]
     old_amount = row[0]
-    new_amount = max(old_amount - number_to_remove, 0)
-    cursor.execute("UPDATE inventory SET amount = :amount WHERE userid = :id AND item = :item", amount=new_amount, id=str(uid), item=item.id)
+    new_amount = old_amount - number_to_remove
+    if new_amount > 0:
+      cursor.execute("UPDATE inventory SET amount = :amount WHERE userid = :id AND item = :item", amount=new_amount, id=str(uid), item=item.id)
+    else:
+      cursor.execute("DELETE FROM inventory WHERE userid = :id AND item = :item", id=str(uid), item=item.id)
   commit_to_database()
 
 def get_item_count(uid, item_id):
