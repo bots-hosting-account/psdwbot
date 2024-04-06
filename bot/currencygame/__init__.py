@@ -56,6 +56,7 @@ async def gamble(cmd_parts, message):
     player_money = get_money(message.author.id)
     if at_stake > player_money:
       await message.reply(f"You can't bet {format(at_stake)}, you only have {format(player_money)}.")
+      return
   
   elif amount_to_bet in ("max", "all", "maximum"):
     at_stake = get_money(message.author.id)
