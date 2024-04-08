@@ -68,6 +68,9 @@ class CountingBase:
         if not cls.is_valid_input(val):
           return
         
+        #Make sure that the database is online
+        cursor.execute("SELECT NULL FROM DUAL")
+        
         if msg.author.id != cls.last_uid and cls.is_next(val):
           await msg.add_reaction("\u2705")
           cls.last_uid = msg.author.id
@@ -92,5 +95,5 @@ class CountingBase:
         
         connection.commit()
       
-    except DatabaseError:
+    except (DatabaseError, AttributeError):
       await message.reply("Counting is currently unavailable, as the database is offline.")
