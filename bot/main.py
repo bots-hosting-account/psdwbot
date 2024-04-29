@@ -88,7 +88,7 @@ async def eval_cmd(message):
     await message.channel.send(f"PsdwBot\nUsing Python version {sys.version}\nThis is the second occurrence of PsdwBot.")
   
   elif cmd == "ad":
-    a = ("https://discord.com", "https://oracle.com", "https://xkcd.com", "https://python.org", "https://www.wikidata.org", "https://ramiro.org", "https://pypi.org/")
+    a = ("https://discord.com", "https://oracle.com", "https://xkcd.com", "https://python.org", "https://www.wikidata.org", "https://ramiro.org", "https://pypi.org")
     await message.channel.send(random.choice(a))
   
   elif cmd == "whoami":
@@ -604,12 +604,9 @@ Channels:\n"""
     await message.reply(svrnfo)
   
   elif cmd == "update":
-    if str(message.author.id)[:10] == "8460701070":
-      await message.channel.send("Updating...")
-      await client.logout()
-      exit()
-    else:
-      await message.channel.send("Not you!")
+    await message.channel.send("Updating...")
+    await client.logout()
+    exit()
   
   
   #If +d was used, delete the message
@@ -672,12 +669,12 @@ async def on_message(message: discord.Message):
         await message.channel.send("you're welcome")
     
     if message.channel.name == "prime-chess":
-      await CountingPrime.check(message)
-      await CountingChess.check(message)
+      await CountingPrime.check(message, client)
+      await CountingChess.check(message, client)
     elif message.channel.name == "fibonacci":
-      await CountingFibonacci.check(message)
+      await CountingFibonacci.check(message, client)
     elif message.channel.name == "custom-fibonacci":
-      await CountingCustomFibonacci.check(message)
+      await CountingCustomFibonacci.check(message, client)
 
 
 if __name__ == "__main__":
