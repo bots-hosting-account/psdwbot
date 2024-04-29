@@ -1,3 +1,5 @@
+import sys
+
 from oracledb.exceptions import DatabaseError
 
 from connect_database import connection
@@ -58,7 +60,7 @@ class CountingBase:
     return msg.content.lower().strip().split()[0]
   
   @classmethod
-  async def check(cls, msg):
+  async def check(cls, msg, client):
     if len(msg.content) == 0:
       return
 
@@ -96,4 +98,6 @@ class CountingBase:
         connection.commit()
       
     except (DatabaseError, AttributeError):
-      await message.reply("Counting is currently unavailable, as the database is offline.")
+      await msg.reply("Database connectivity has been temporarily lost. Please wait ten seconds and try again.")
+      await client.logout()
+      sys.exit()
