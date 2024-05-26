@@ -1,7 +1,5 @@
 import sys
 
-from oracledb.exceptions import DatabaseError
-
 from connect_database import connection
 
 class CountingBase:
@@ -64,40 +62,31 @@ class CountingBase:
     if len(msg.content) == 0:
       return
 
-    try:
-      with connection.cursor() as cursor:
-        val = cls.get_val_from_message(msg)
-        if not cls.is_valid_input(val):
-          return
-        
-        #Make sure that the database is online
-        cursor.execute("SELECT NULL FROM DUAL")
-        
-        if msg.author.id != cls.last_uid and cls.is_next(val):
-          await msg.add_reaction("\u2705")
-          cls.last_uid = msg.author.id
-          cls.update(val)
-        
-          if cls.did_beat_high_score():
-            cls.update_high_score()
-            high_score_str = str(cls.get_high_score())
-            cursor.execute("UPDATE counting SET highscore = :highscore WHERE name = :name", highscore=high_score_str, name=cls.DATABASE_NAME)
-        
-        else:
-          if msg.author.id == cls.last_uid:
-            error = cls.MESSAGE_SAME_USER
-          else:
-            error = cls.MESSAGE_INCORRECT
-          await msg.add_reaction("\u274c")
-          await msg.reply(f"{msg.author.mention} RUINED IT AT **{cls.get_current_number()}**!! Next {cls.DISPLAY_NAME} is **{cls.START_VALUE}**. **{error}**")
-          cls.last_uid = 0
-          cls.reset()
-        
-        cursor.execute("UPDATE counting SET save = :save WHERE name = :name", save=cls.get_save_str(), name=cls.DATABASE_NAME)
-        
-        connection.commit()
+    with connection.cursor() as cursor:
+      val = cls.get_val_from_message(msg)
+      if not cls.is_valid_input(val):
+        return
       
-    except (DatabaseError, AttributeError):
-      await msg.reply("Database connectivity has been temporarily lost. Please wait ten seconds and try again.")
-      await client.logout()
-      sys.exit()
+      if msg.author.id != cls.last_uid and cls.is_next(val):
+        await msg.add_reaction("\u2705")
+        cls.last_uid = msg.author.id
+        cls.update(val)
+      
+        if cls.did_beat_high_score():
+          cls.update_high_score()
+          high_score_str = str(cls.get_high_score())
+          cursor.execute("UPDATE counting SET highscore = :highscore WHERE name = :name", highscore=high_score_str, name=cls.DATABASE_NAME)
+      
+      else:
+        if msg.author.id == cls.last_uid:
+          error = cls.MESSAGE_SAME_USER
+        else:
+          error = cls.MESSAGE_INCORRECT
+        await msg.add_reaction("\u274c")
+        await msg.reply(f"{msg.author.mention} RUINED IT AT **{cls.get_current_number()}**!! Next {cls.DISPLAY_NAME} is **{cls.START_VALUE}**. **{error}**")
+        cls.last_uid = 0
+        cls.reset()
+      
+      cursor.execute("UPDATE counting SET save = :save WHERE name = :name", save=cls.get_save_str(), name=cls.DATABASE_NAME)
+      
+      connection.commit()
