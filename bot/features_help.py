@@ -222,19 +222,19 @@ If `red`, `green`, and `blue` are supplied, then the matching RGB colour will be
   ),
   "markov": (
     ["sentence", "!max sentence"],
-    'Generate a random "sentence" which should resemble the original `sentence`. This command uses, and is named for, [Markov chains](https://brilliant.org/wiki/markov-chains/).\n\nIf `max` is supplied and is greater than zero, it will be the maximum possible length of the resulting "sentence".\n\nSee also: `+markovword`, `+markovadjective`, `+markovnoun`, and `+markovverb`.',
+    'Generate a random "sentence" which should resemble the original `sentence`. This command uses, and is named for, [Markov chains](https://brilliant.org/wiki/markov-chains/).\n\nIf `max` is supplied and is greater than zero, it will be the maximum possible length of the resulting "sentence".\n\nSee also: `+markovword`, `+mobydick`, `+markovadjective`, `+markovnoun`, and `+markovverb`.',
     ["This is an example sentence", "!3 This is an example sentence"],
     ["m"]
   ),
   "markovword": (
     ["words", "!max words"],
-    'Generate a random "word" which should resemble the original `words`. This command uses, and is named for, [Markov chains](https://brilliant.org/wiki/markov-chains/).\n\nIf `max` is supplied and is greater than zero, it will be the maximum possible length of the resulting "word".\n\nSee also: `+markov`, `+markovadjective`, `+markovnoun`, and `+markovverb`.',
+    'Generate a random "word" which should resemble the original `words`. This command uses, and is named for, [Markov chains](https://brilliant.org/wiki/markov-chains/).\n\nIf `max` is supplied and is greater than zero, it will be the maximum possible length of the resulting "word".\n\nSee also: `+markov`, `+mobydick`, `+markovadjective`, `+markovnoun`, and `+markovverb`.',
     ["Java Python JavaScript csharp cplusplus objectivec rust", "Alden Alec Anton Arden Arlen Armand Arron Augustus Avery Benedict Bennett Branden Charles", "!4 Alden Alec Anton Arden Arlen Armand Arron Augustus Avery Benedict Bennett Branden"],
     ["markovwords", "mw"]
   ),
   "markovadjective": (
     [""],
-    'Generate a random "adjective" using [Markov chains](https://brilliant.org/wiki/markov-chains/) and a list of more than 1000 real English adjectives.\n\nSee also: `+markov` and `+markovword`, `+markovnoun`, and `+markovverb`.',
+    'Generate a random "adjective" using [Markov chains](https://brilliant.org/wiki/markov-chains/) and a list of more than 1000 real English adjectives.\n\nSee also: `+markov`, `+markovword`, `+markovnoun`, and `+markovverb`.',
     [""],
     ["madj", "ma"]
   ),
@@ -249,6 +249,12 @@ If `red`, `green`, and `blue` are supplied, then the matching RGB colour will be
     'Generate a random "verb" using [Markov chains](https://brilliant.org/wiki/markov-chains/) and a list of around 1000 real English verbs.\n\nSee also: `+markov`, `+markovword`, `+markovadjective`, and `+markovnoun`.',
     [""],
     ["mverb", "mv"]
+  ),
+  "mobydick": (
+    ["", "max", "max context"],
+    'Generate random text using *[Moby-Dick](https://en.wikipedia.org/wiki/Moby-Dick)* and [Markov chains](https://brilliant.org/wiki/markov-chains/).\n\nIf `max` is supplied, it will be the maximum possible length of the resulting text; the default value is 200.\n\n`context`, an integer from 1 to 5, controls the "temperature" of the resulting text, with the default being 1. Using higher values results in more grammatical text, but increases the likelihood of text being copied verbatim from the novel.\n\nSee also: `+markov`.',
+    ["", "500", "200 3"],
+    ["moby", "md"]
   )
 }
 
@@ -279,7 +285,7 @@ def bot_help(cmd_name):
     sp = " " if len(usage) > 0 else ""
     description += f"\n• `+{cmd_name}{sp}{usage}`"
   description += "\n\n" + cmd[1]
-
+  
   description += "\n\n**Examples:**"
   for example in cmd[2]:
     sp = " " if len(example) > 0 else ""

@@ -57,7 +57,11 @@ features_textgen = """Text generating commands:
   • `+cfnparagraph` or `+cfnpara` — Generate a random paragraph, then repeatedly apply corruptfrench to it
   • `+ultrafrenchpara` or `+ufpara` — Generate a random paragraph, repeatedly corrupt it, then mækę it Frénçh
   • `+markov`, `+m` — Generate a random sentence based on a given sentence, using Markov chains
-  • `+markovword`, `+markovwords`, `+mw` — Generate a random word based on a given list of words, using Markov chains"""
+  • `+markovword`, `+markovwords`, `+mw` — Generate a random word based on a given list of words, using Markov chains
+  • `+mobydick`, `+moby`, `+md` — Generate random text using *Moby-Dick* and Markov chains
+  • `+markovadj`, `+madj`, `+ma` — Generate a random "adjective" using Markov chains
+  • `+markovnoun`, `+mnoun`, `+mn` — Generate a random "noun" using Markov chains
+  • `+markovverb`, `+mverb`, `+mv` — Generate a random "verb" using Markov chains"""
 features_chans = """Channel-related commands:
   • `+chan` — Say something to another channel (use the name of a channel in the current server)
   • `+savechan` or `+vc` — Save the current channel as a supplied name (should only be one word long)
