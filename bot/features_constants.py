@@ -32,7 +32,7 @@ features_general = """General commands:
   • `+roman` — Convert to and from Roman numerals
   • `+xkcd` — Get a random xkcd comic
   • `+calvinandhobbes`, `+cah` — Get a random Calvin and Hobbes comic
-  • `+outlink` — Get a random outlink from a Wikipedia
+  • `+outlink` — Get a random outlink from a Wikipedia article
   • `+unusual` — Get a random unusual Wikipedia article
   • `+element`, `+el` — Get information about an element"""
 features_text = """Text mangling commands:
