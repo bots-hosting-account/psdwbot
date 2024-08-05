@@ -48,7 +48,7 @@ features_text = """Text mangling commands:
   • `+corruptfrenchn` or `+cfn` — Repeatedly apply corruptfrench to text
   • `+ultrafrench` or `+uf` — Repeatedly corrupt text, then make it French
   • `+wordelements` or `+wel` — Break a word into elements"""
-features_textgen = """Text generating commands:
+features_textgen = """Text generation commands:
   • `+sentence` — Generate a random sentence
   • `+paragraph` or `+para` — Generate a random paragraph
   • `+frenchparagraph` or `+frenchpara` — Generate a random paragraph, then mækę it Frénçh
