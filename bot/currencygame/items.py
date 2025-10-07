@@ -21,14 +21,14 @@ class _Holiday:
     return self.str
 
 class Holidays:
-  HALLOWEEN = _Holiday("Halloween", ":jack_o_lantern:", (10, 25), (10, 31), ["{}s have an increased chance to spawn", "Using {}s gives an increased payout", "Embeds are coloured appropriately", "Graveyards can be searched"])
+  HALLOWEEN = _Holiday("Halloween", ":jack_o_lantern:", (10, 1), (10, 31), ["{}s have an increased chance to spawn", "Using {}s gives an increased payout", "Embeds are coloured appropriately", "Graveyards can be searched"])
   MOLE_DAY = _Holiday("Mole Day", ":mole:", (10, 23), None, ["{}s have an increased chance to spawn"])
   NEW_YEARS_EVE = _Holiday("New Year's Eve", ":mirror_ball:", (12, 31), None, ["Times Square can be searched"])
 
 today = datetime.now()
 if today.month == 10 and today.day == 23:
   holiday = Holidays.MOLE_DAY
-elif today.month == 10 and today.day >= 25:
+elif today.month == 10:
   holiday = Holidays.HALLOWEEN
 elif today.month == 12 and today.day == 31:
   holiday = Holidays.NEW_YEARS_EVE
