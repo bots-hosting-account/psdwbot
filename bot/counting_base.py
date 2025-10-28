@@ -58,7 +58,7 @@ class CountingBase:
     return msg.content.lower().strip().split()[0]
   
   @classmethod
-  async def check(cls, msg, client):
+  async def check(cls, msg):
     if len(msg.content) == 0:
       return
 
@@ -90,3 +90,12 @@ class CountingBase:
       cursor.execute("UPDATE counting SET save = :save WHERE name = :name", save=cls.get_save_str(), name=cls.DATABASE_NAME)
       
       connection.commit()
+  
+  @classmethod
+  async def recheck(cls, msg):
+    history = await msg.channel.history(limit=2).flatten()
+    if len(history) < 2:
+       return
+    
+    await cls.check(history[1])
+    await msg.add_reaction("\u2705")

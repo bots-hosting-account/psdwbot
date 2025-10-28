@@ -545,6 +545,17 @@ async def eval_cmd(message):
   elif cmd == "primehs":
     await message.reply(f"The highest-reached prime number is **{CountingPrime.get_high_score()}**.")
   
+  elif cmd == "recheck":
+    if message.channel.name == "prime-chess":
+      await CountingPrime.recheck(message)
+      await CountingChess.recheck(message)
+    elif message.channel.name == "fibonacci":
+      await CountingFibonacci.recheck(message)
+    elif message.channel.name == "custom-fibonacci":
+      await CountingCustomFibonacci.recheck(message)
+    else:
+      await message.reply("Must be used in the prime-chess, fibonacci, or custom-fibonacci channel.")
+  
   elif cmd in ("dictionary", "dict"):
     if len(cmd_parts) < 2:
       help_embed = discord.Embed(title="Invalid Usage", description="Usage: `+dictionary query`\nSearch for an entry in [Eo'iona's dictionary](https://conworkshop.com/dictionary.php?L=EOO) (updated as of 2024/01/01).\n`query` must be an English word/phrase.")
@@ -669,12 +680,12 @@ async def on_message(message: discord.Message):
         await message.channel.send("you're welcome")
     
     if message.channel.name == "prime-chess":
-      await CountingPrime.check(message, client)
-      await CountingChess.check(message, client)
+      await CountingPrime.check(message)
+      await CountingChess.check(message)
     elif message.channel.name == "fibonacci":
-      await CountingFibonacci.check(message, client)
+      await CountingFibonacci.check(message)
     elif message.channel.name == "custom-fibonacci":
-      await CountingCustomFibonacci.check(message, client)
+      await CountingCustomFibonacci.check(message)
 
 
 if __name__ == "__main__":
