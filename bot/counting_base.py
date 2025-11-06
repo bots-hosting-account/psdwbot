@@ -93,9 +93,14 @@ class CountingBase:
   
   @classmethod
   async def recheck(cls, msg):
-    history = await msg.channel.history(limit=2).flatten()
-    if len(history) < 2:
-       return
+    if msg.reference is not None and msg.reference.resolved:
+      ref_id = msg.reference.message_id
+      to_recheck = await msg.channel.fetch_message(ref_id)
+    else:
+      history = await msg.channel.history(limit=2).flatten()
+      if len(history) < 2:
+        return
+      to_recheck = history[1]
     
-    await cls.check(history[1])
+    await cls.check(to_recheck)
     await msg.add_reaction("\u2705")
