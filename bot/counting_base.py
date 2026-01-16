@@ -44,6 +44,29 @@ class CountingBase:
       save_str, high_score = cursor.fetchone()
       cls.init_with_values(*cls.parse_save_str(save_str))
       cls.high_score = int(high_score)
+
+  @classmethod
+  async def check_unseen_messages(cls, channel):
+    with connection.cursor() as cursor:
+      cursor.execute("SELECT last_message_id FROM counting WHERE name = :name", name=cls.DATABASE_NAME)
+      last_message_id = int(cursor.fetchone()[0])
+    history = await channel.history(limit=100).flatten()
+    first_check_index = -1
+    for i, message in enumerate(history):
+      if message.id == last_message_id:
+        first_check_index = i - 1
+        break
+    if first_check_index >= 0:
+      for message in history[first_check_index::-1]:
+        await cls.check(message)
+    if len(history) > 0 and last_message_id != history[0].id:
+      await cls.update_last_message_id(history[0].id)
+
+  @classmethod
+  async def update_last_message_id(cls, new_id):
+    with connection.cursor() as cursor:
+      cursor.execute("UPDATE counting SET last_message_id = :new_id WHERE name = :name", new_id=new_id, name=cls.DATABASE_NAME)
+      connection.commit()
   
   @staticmethod
   def is_valid_input(value):
@@ -59,6 +82,8 @@ class CountingBase:
   
   @classmethod
   async def check(cls, msg):
+    cls.update_last_message_id(msg.id)
+
     if len(msg.content) == 0:
       return
 

@@ -558,7 +558,7 @@ async def eval_cmd(message):
   
   elif cmd in ("dictionary", "dict"):
     if len(cmd_parts) < 2:
-      help_embed = discord.Embed(title="Invalid Usage", description="Usage: `+dictionary query`\nSearch for an entry in [Eo'iona's dictionary](https://conworkshop.com/dictionary.php?L=EOO) (updated as of 2024/01/01).\n`query` must be an English word/phrase.")
+      help_embed = discord.Embed(title="Invalid Usage", description="Usage: `+dictionary query`\nSearch for an entry in [Eo'iona's dictionary](https://conworkshop.com/dictionary.php?L=EOO) (updated as of 2026/01/01).\n`query` must be an English word/phrase.")
       await message.reply(embed=help_embed)
     else:
       query = " ".join(cmd_parts[1:])
@@ -566,7 +566,7 @@ async def eval_cmd(message):
   
   elif cmd in ("revdictionary", "reversedictionary", "revdict"):
     if len(cmd_parts) < 2:
-      help_embed = discord.Embed(title="Invalid Usage", description="Usage: `+reversedictionary query`\nSearch for an entry in [Eo'iona's dictionary](https://conworkshop.com/dictionary.php?L=EOO) (updated as of 2024/01/01).\n`query` must be an Eo'iona word/phrase.")
+      help_embed = discord.Embed(title="Invalid Usage", description="Usage: `+reversedictionary query`\nSearch for an entry in [Eo'iona's dictionary](https://conworkshop.com/dictionary.php?L=EOO) (updated as of 2026/01/01).\n`query` must be an Eo'iona word/phrase.")
       await message.reply(embed=help_embed)
     else:
       query = " ".join(cmd_parts[1:])
@@ -584,7 +584,7 @@ async def eval_cmd(message):
         emoji = discord.utils.get(client.emojis, name=cmd_parts[2])
         await emsg.add_reaction(emoji)
       except:
-        await emsg.add_reaction(cmd_parts[4])
+        await emsg.add_reaction(cmd_parts[2])
     else:
       server = discord.utils.get(client.guilds, id=int(cmd_parts[1]))
       channel = discord.utils.get(server.channels, id=int(cmd_parts[2]))
@@ -650,6 +650,11 @@ async def on_ready():
   await client.change_presence(activity=discord.Game(name="+help / +p help"))
   
   channels.initialise(client)
+
+  await CountingPrime.check_unseen_messages(client.get_channel(987821885561651200))
+  await CountingChess.check_unseen_messages(client.get_channel(987821885561651200))
+  await CountingFibonacci.check_unseen_messages(client.get_channel(1052687081958293614))
+  await CountingCustomFibonacci.check_unseen_messages(client.get_channel(1065723263902302218))
 
 
 @client.listen("on_message")
