@@ -82,7 +82,7 @@ class CountingBase:
   
   @classmethod
   async def check(cls, msg):
-    cls.update_last_message_id(msg.id)
+    await cls.update_last_message_id(msg.id)
 
     if len(msg.content) == 0:
       return
