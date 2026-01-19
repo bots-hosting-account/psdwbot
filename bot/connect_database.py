@@ -1,4 +1,5 @@
 import oracledb
+from oracledb.exceptions import DatabaseError
 
 from connect_database_internal import get_connection
 
@@ -10,7 +11,7 @@ class _Connection:
     cursor = self.con.cursor()
     try:
       cursor.execute("SELECT NULL FROM DUAL")
-    except AttributeError:
+    except (AttributeError, DatabaseError):
       self.con.close()
       self.con = get_connection()
       cursor = self.con.cursor()
