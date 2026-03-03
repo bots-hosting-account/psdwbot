@@ -26,12 +26,13 @@ async def generate_image(cmd_parts, message):
   else:
     r = g = b = 1
   
-  red = random.randint(0, 255) * r
-  green = random.randint(0, 255) * g
-  blue = random.randint(0, 255) * b
-  
   image = Image.new("RGB", (w, h))
-  colours = list((red, green, blue) for i in range(w * h))
+  colours = []
+  for _ in range(w * h):
+    red = random.randint(0, 255) * r
+    green = random.randint(0, 255) * g
+    blue = random.randint(0, 255) * b
+    colours.append((red, green, blue))
   image.putdata(colours)
   
   rw = rh = 0
