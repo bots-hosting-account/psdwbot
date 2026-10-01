@@ -39,7 +39,7 @@ features_text = """Text mangling commands:
   • `+palindrome` — Palindromify text
   • `+posteoo` — Convert from postfix accents to proper accents
   • `+accent` — Randomly accent a string (none, high, low, falling)
-  • `+accent` — Randomly accent a string (none, high, low, falling) with a higher chance of no accent
+  • `+accent2` — Randomly accent a string (none, high, low, falling) with a higher chance of no accent
   • `+accentr` — Randomly accent a string (none, high, low, falling, rising)
   • `+accentr2` — Randomly accent a string (none, high, low, falling, rising) with a higher chance of no accent
   • `+corrupt` — Corrupt text
